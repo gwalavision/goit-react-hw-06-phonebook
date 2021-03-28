@@ -1,64 +1,37 @@
-import { useState, useEffect } from 'react';
-
+import { useEffect } from 'react';
+import { connect } from 'react-redux';
 import ContactsInput from './components/ContactsInput';
 import ContactsList from './components/ContactsList';
+import { localStorageContacts } from './redux/actions';
 
-function App() {
-  const [contacts, setContacts] = useState([]);
-  const [filter, setFilter] = useState('');
-
-  const changeFilter = e => {
-    setFilter(e.target.value);
-  };
-
-  const getVisibleContacts = () => {
-    const normalizedFilter = filter.toLowerCase();
-
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizedFilter),
-    );
-  };
-
-  const deleteItem = id => {
-    setContacts(prevState => [
-      ...prevState.filter(contact => contact.id !== id),
-    ]);
-  };
-
+function App({ contacts, loadfromLocalStorage }) {
   // componentDidMount
   useEffect(() => {
-    console.log('mount');
     const parsedContacts = JSON.parse(localStorage.getItem('contacts'));
-
     if (parsedContacts) {
-      setContacts(parsedContacts);
+      loadfromLocalStorage(parsedContacts);
     }
   }, []);
 
   // componentDidUpdate
   useEffect(() => {
-    console.log('обновилось поле');
     localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
-  const getContacts = getVisibleContacts();
-
   return (
     <>
-      <ContactsInput
-        title="Phonebook"
-        contacts={contacts}
-        setContacts={setContacts}
-      />
-      <ContactsList
-        title="Contacts"
-        contacts={getContacts}
-        filter={filter}
-        onChange={changeFilter}
-        onDelete={deleteItem}
-      />
+      <ContactsInput title="Phonebook" />
+      <ContactsList title="Contacts" />
     </>
   );
 }
 
-export default App;
+const mapStateToProps = state => ({
+  contacts: state.contacts.items,
+});
+
+const mapDispatchToProps = dispatch => ({
+  loadfromLocalStorage: arr => dispatch(localStorageContacts(arr)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

@@ -1,3 +1,6 @@
+import { connect } from 'react-redux';
+import { filterContacts } from '../../redux/actions';
+
 const ContactsFinderInput = ({ value, onChange }) => {
   return (
     <form>
@@ -9,4 +12,16 @@ const ContactsFinderInput = ({ value, onChange }) => {
   );
 };
 
-export default ContactsFinderInput;
+const mapStateToProps = state => ({
+  contacts: state.contacts.items,
+  value: state.contacts.filter,
+});
+
+const mapDispatchToProps = dispatch => ({
+  onChange: e => dispatch(filterContacts(e.target.value)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ContactsFinderInput);

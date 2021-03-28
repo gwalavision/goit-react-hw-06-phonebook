@@ -1,8 +1,10 @@
 import PropTypes from 'prop-types';
 import { v4 as uuid4 } from 'uuid';
 import { useState } from 'react';
+import { connect } from 'react-redux';
+import { addContact } from '../../redux/actions';
 
-const ContactsInput = ({ title, contacts, setContacts }) => {
+const ContactsInput = ({ title, contacts, onSubmit }) => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
@@ -14,10 +16,11 @@ const ContactsInput = ({ title, contacts, setContacts }) => {
   const handleSubmit = e => {
     e.preventDefault();
 
-    const existedContact = contacts.find(contact => contact.name === name);
-
-    if (existedContact) {
-      return alert(`${name} is already in contacts`);
+    if (contacts.length > 0) {
+      const existedContact = contacts.find(contact => contact.name === name);
+      if (existedContact) {
+        return alert(`${name} is already in contacts`);
+      }
     }
 
     const newContact = {
@@ -26,7 +29,7 @@ const ContactsInput = ({ title, contacts, setContacts }) => {
       number,
     };
 
-    setContacts(prevState => [...prevState, newContact]);
+    onSubmit(newContact);
   };
 
   return (
@@ -69,4 +72,12 @@ ContactsInput.propTypes = {
   title: PropTypes.string.isRequired,
 };
 
-export default ContactsInput;
+const mapStateToProps = state => ({
+  contacts: state.contacts.items,
+});
+
+const mapDispatchToProps = dispatch => ({
+  onSubmit: text => dispatch(addContact(text)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactsInput);
