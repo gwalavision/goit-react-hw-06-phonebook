@@ -13,7 +13,6 @@ const ContactsFinderInput = ({ value, onChange }) => {
 };
 
 const mapStateToProps = state => ({
-  contacts: state.contacts.items,
   value: state.contacts.filter,
 });
 
